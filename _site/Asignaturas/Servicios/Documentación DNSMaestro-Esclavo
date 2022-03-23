@@ -1,0 +1,128 @@
+h1. EJERCICIO 1:  INSTALACIÓN Y CONFIGURACIÓN DEL SERVIDOR BIND9
+
+h2. TAREA 1: Configuración del cliente, para comprobar que consulta al servidor DNS que hemos configurado
+
+Para indicarle al cliente que DNS debe de consultar hemos editado el fichero */etc/resolv.conf* y hemos añadido la línea: *echo nameserver 192.168.122.137* que es la ip de nuestro servidor dns configurado.
+
+!resolv-config-cliente.png!
+
+h2. TAREA 2: Entrega las zonas que has definido.
+
+*ZONA DIRECTA*
+
+Al fichero de la zona directa lo he llamado *db.example.com*, y he realizado la siguiente configuración.
+
+!zona-directa.png!
+
+*ZONA INVERSA*
+
+Al fichero de la zona inversa lo he llamado *db.122.168.192*, y he realizado la siguiente configuración.
+
+!zona-inversa.png!
+
+h2. TAREA 3. Realiza las consultas dig/nslookup desde los clientes preguntando por los siguientes: 
+
+h3. Dirección de tunombre.iesgn.org, www.iesgn.org, ftp.iesgn.org
+
+La consulta *tunombre.iesgn.org* la he realizado de la siguiente manera <pre> dig miguel.iesgn.org</pre>.
+!dig-miguel-iesgn-org.png!
+
+La consulta *www.iesgn.org* la he realizado de la siguiente manera <pre> dig iesgn.org</pre>.
+!dig-iesgn-org.png!
+
+La consulta *ftp.iesgn.org* la he realizado de la siguiente manera <pre> dig ftp.iesgn.org</pre>.
+!dig-ftp-iesgn-org.png!
+
+h3. El servidor *DNS con autoridad* sobre la zona del dominio *iesgn.org*
+
+Para esta consulta he utilizado el comando <pre> dig ns iesgn.org</pre>
+!servidor-autoridad.png!
+
+h3. El servidor de *correo* configurado para *iesgn.org*
+
+Para esta consulta he utilizado el comando <pre> dig mx iesgn.org </pre>
+!servidor-correo.png!
+
+h3. La dirección IP de *www.josedomingo.org*
+
+Para esta consulta he usado el comando <pre> dig +short www.joseodmingo.org </pre>
+!ip-josedomingo-org.png!
+
+h3. Una resolución inversa
+
+Para esta resolución he usado el comando <pre>dig -x 192.168.122.201 </pre>
+!resolucion-inversa.png!
+
+
+h1. Ejercicio 2: Instalación y configuración de un servidor DNS esclavo 
+
+h2. Entrega la configuración de las zonas del maestro y del esclavo.
+
+Para ver la configuración de la *zona en el maestro* he introducido el comando <pre> cat /etc/bind/named.conf.local</pre> en la maquina *DNS-Maestro*.
+
+!zona-directa-maestro.png!
+
+Para ver la configuración de la *zona en el esclavo* he introducido el comando <pre> cat /etc/bind/named.conf.local</pre> en la maquina *esclavo*.
+
+!zona-esclavo.png!
+
+h2. Comprobación de zonas definidas en el maestro tienen algún error con el comando adecuado y  comprobación para determinar si la configuración de named.conf tiene algún error con el comando adecuado.
+
+Para comprobar si la sintaxis del fichero es correcta <pre>named-checkconf</pre>.
+Para comprobar si las zonas están bien definidas he usado el comando <pre>named-checkzone iesgn.org /var/cache/bind/db.example.com</pre>.
+!comprobacion-fichero-maestro.png!
+
+h2. Muestra la salida del log donde se demuestra que se ha realizado la transferencia de zona.
+
+Para mostrar que realmente se ha realizado la transferencia de zona automáticamente primero he cambiado el *serial* del fichero de zona *db.example.com* ; inicialmente el serial estaba en *1* y lo he cambiado a *2* . Posteriormente he comprobado el fichero de *log*  con el comando <pre>tail /var/log/syslog</pre>.
+!log-transferencia-automatica-zona.png!
+
+h2. Entrega la configuración dDNS de los clientes.
+
+El cliente que ehe usado es mi máquina anfitriona y en el */etc/resolv.conf* he configurado las ip`s de los servidores DNS.
+
+!servidores-dns-cliente.png!
+
+h2. Realiza una consulta con dig tanto al maestro como al esclavo para comprobar que las respuestas son autorizadas. ¿En qué te tienes que fijar?
+
+Para fijarme que las respuestas son autorizadas tengo que fijarme en la parte de *flags* si viene el bit *aa* y que los *números de serie* coincidan.
+
+!consulta-maestroyservidor.png!
+
+h2. Solicita una copia completa de la zona desde el cliente ¿qué tiene que ocurrir?. Solicita una copia completa desde el esclavo ¿qué tiene que ocurrir?
+
+El comando para pedir la copia completa de la zona es <pre>@192.168.122.137 iesgn.org. axfr</pre> desde el DNS-Esclavo mostrándonos lo siguiente
+
+!copiacompleta-zona-esclavo.png!
+
+he indcando que la transferencia se ha efectuado satisfactoriamente.
+
+y desde el cliente he introducido el mismo comando teniendo esta salida 
+
+!transferencia-cliente.png!
+
+indicándonos que la transferencia ha fallado.
+
+h2. Realiza una consulta desde el cliente y comprueba que servidor está respondiendo.
+
+Para este apartado he realizado la siguiente consulta desde el cliente <pre>dig ftp.iesgn.org</pre> y al estar el DNS-Maestro encendido me ha respondido él. Porque en el apartado *SERVER* al final de la consulta muestra la *ip* de nuestro *DNS-Maestro* que es la *192.168.122.137*.
+
+!respuesta-maestro.png!
+
+h2. Posteriormente apaga el servidor maestro y vuelve a realizar una consulta desde el cliente ¿quién responde? Enseña al profesor el funcionamiento del servidor esclavo.
+
+Una vez apagado el DNS-Maestro he vuelto ha realizar la misma consulta, mostrándome en el apartado *SERVER* la *ip* del *DNS-Esclavo* que es la *192.168.122.52*.
+
+!respuesta-esclavo.png!
+
+h2. EJERCICIO3: Delegación de Subdominio
+
+Para ello he tenido que modificar el fichero de zona *db.iesgn.org*
+
+
+
+
+
+
+
+

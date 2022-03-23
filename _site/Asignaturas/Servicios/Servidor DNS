@@ -1,0 +1,57 @@
+apt install bind9
+ps -A | grep named
+etc/resolv --> nameserver ip interfaz wlan2
+borrar cache servidor dns ->  rndc flush
+dig @ ip
+
+cd /etc/bind named.conf.local
+
+nano /etc/host -> prueba.example.com prueba
+
+
+#Servidor con autoridad para un dominio
+
+nano name.conf.local
+
+descomentamos linea  include
+
+##Resolucion Directa
+
+zone "example.com"
+{
+type master;
+file "db.example.com;"}
+
+##Resolucion Inversa
+
+zone "121.168.192.in-addr.arpa"
+{
+type master;
+file "db.121.168.192;"
+}
+
+cp db.empty /var/cache/bind/db.example.com
+
+@ IN SOA PRUEBA.EXAMPLE.COM SUPPORT.EXAMPLE.COM
+
+@ IN NS SERVIDOR CON AUTORIDAD
+@ IN MX 10 UTRERA.EXAMPLE.COM --> SERVIDOR DE CORREO 
+
+$ORIGIN example.com.
+
+prueba 		IN 	A 	192.168.121.66
+UTRERA		IN 	A	192.168.121.100
+DOSHERMANAS     IN	A 	192.168.121.101
+www 		IN 	CNAME 	doshermanas
+ftp 		IN 	CNAME 	UTRERA 
+
+CONVERTIR DNS EN DINAMICO PARA QUE HABLE CON EL DHCP A LA HORA DE ASIGNAR UNA IP A UN EQUIPO
+
+#COPIAR FICHERO DE LA ZONA DIRECTA PARA CONFIGURAR LA ZONA INVERSA
+
+$ORIGIN 121.168.192.IN-ADDR.ARPA
+66  IN PTR PRUEBA.EXAMPLE.COM
+100 IN PTR UTRERA.EXAMPLE.COM
+101 IN PTR DOSHERMANAS
+
+dig -x IP para preguntar por la resolucion inversa dns

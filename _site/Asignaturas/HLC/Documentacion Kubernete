@@ -1,0 +1,275 @@
+h1. ACTIVIDAD 2.1
+
+1. Pantallazo con la salida de *minikube status*
+
+!minikube-status.png!
+
+2. Pantallazo con la salida de *kubectl get nodes -o wide*
+
+!kube-ctl1.png!
+
+h1. ACTIVIDAD 3.1
+
+h2. TAREA 1
+
+He creado un *fichero.yaml* llamado *pod1.yaml*
+
+<pre>
+apiVersion: v1 # required
+kind: Pod # required
+metadata: # required
+ name: pod-nginx # required
+ labels:
+   app: nginx
+   service: web
+spec: # required
+ containers:
+   - image: iesgn/test_web:latest
+     name: contenedor-nginx
+     imagePullPolicy: Always
+</pre> 
+
+*Nombre del POD*: pod_nginx
+*Nombre del Contenedor*: contenedor-nginx
+
+h2. TAREA 2
+
+Para *crear* el POD he usado <pre>kubectl create -f pod1.yaml</pre>
+
+h2. TAREA 3
+
+Para ver el *estado* del *POD* he usado <pre>kubectl get pods </pre>
+
+!pod-status.png!
+
+h2. TAREA 4
+
+Para ver el *estado detallado* del *POD* he usado <pre>kubectl get pod -o wide</pre>
+
+!pod-detallado.png!
+
+Para ver con todo detalle un POD específico, en este caso, nuestro *pod-nginx*
+ejecutaremos el comando <pre>kubectl describe pod pod-nginx</pre>
+
+!pod-detallado2.png!
+
+h2. TAREA 5
+
+Para el *acceso interactivo* he usado el comando <pre>kubectl exec -it pod-nginx -- /bin/bash</pre> y luego he hecho un *ls* del directorio *htdocs*.
+
+!fichero-index.png!
+
+h2. TAREA 6
+
+Para crear el *redireccionamiento* he usado el comando <pre> kubectl port-forward 8888:80 </pre>
+
+!port-forward.png!
+
+Y luego he accedido con *lynx* a la aplicación <pre> lynx http://localhost:8888 </pre>
+
+!lynx-aplicacion.png!
+
+h2. TAREA 7
+
+Para mostrar los *logs* he ejecutado el comando <pre> kubectl logs pod-nginx </pre> y en la última línea comprobamos que se ha producido una *peticion http*.
+
+!logs-pod.png!
+
+h2. TAREA 8
+
+Para *eliminar* el POD he usado <pre>kubectl delete pod pod-nginx </pre>y para comprobar que se ha eliminado he usado <pre>kubectl get pods</pre>.
+
+!eliminar-pod.png!
+
+
+h1. TAREA 4.1
+
+He *creado* el fichero *nginx-rs.yaml* usando <pre>kubectl create -f nginx-rs.yaml </pre>
+
+!replicaset-yaml.png!
+
+He *mostrado* la creación del *ReplicaSet* y los *tres PODS* con el comando <pre>kubectl get rs,pods </pre>
+
+!replicaset-escenario.png!
+
+He *mostrado la información* del *ReplicaSet* con el comando <pre> kubectl describe rs replicaset-nginx </pre>
+
+!replicaset-detallado.png!
+
+He *eliminado* un pod con <pre>kubectl delete pod replicaset-nginx-4fh9b</pre> y luego he *consultado* la información del *ReplicaSet* con <pre>kubectl describe rs replicaset-nginx</pre>
+
+!replicaset-tolerancia-fallo.png!
+
+He *escalado* el *ReplicaSet* con el comando <pre> kubectl scale rs replicaset-nginx --replicas=5</pre> y luego he *comprobado* el *ReplicaSet* con <pre>kubectl describe rs replicaset-nginx</pre>
+
+!replicaset-escalado.png!
+
+h1. TAREA 5.1: TRABAJANDO CON DEPLOYMENTS
+
+h2. PANTALLAZO 1: FICHERO DEPLOYMENT.YAML
+
+!deployment-yaml.png!
+
+h2. PANTALLAZO 2: RECURSOS CREADOS
+
+!recursos-deployment.png!
+
+h2. PANTALLAZO 3: INFORMACION DETALLADA DEL DEPLOYMENT
+
+!deployment-describe.png!
+
+h2. PANTALLAZO 4: APLICACION WEB DESDE NAVEGADOR
+
+!web-deployment.png!
+
+h2. PANTALLAZO 5: LOGS DEL DESPLIEGUE
+
+!deployment-logs.png!
+
+h1. TAREA 5.2: ACTUALIZACION Y DESACTUALIZACION DE NUESTRA APLICACION
+
+h2. PANTALLAZO 1: ACCESO DEL NAVEGADOR A LA VERSION 1
+
+!web-version1.png!
+
+h2. PANTALLAZO 2: ACCESO DEL NAVEGADOR A LA VERSION 2
+
+!web-version2.png!
+
+h2. PANTALLAZO 3: HISTORIAL DE ACTUALIZACION DEL DESPLIEGUE VERSION 2
+
+!historial-despliegue.png!
+
+h2. PANTALLAZO 4: ACCESO DEL NAVEGADOR A LA VERSION 3
+
+!web-version3.png!
+
+h2. PANTALLAZO 5: HISTORIAL DE ACTUALIZACION DESPUES DE ROLLBACK
+
+!historial-despliegue2.png!
+
+h2. PANTALLAZO 6: ACCESO DEL NAVEGADOR A LA VERSION DESPUES DE ROLLOUT
+
+!web-version2.png!
+
+h1. TAREA 5.3: DESPLIEGE DE LA APLICACION GUESTBOOK
+
+h2. PANTALLAZO 1: RECURSOS CREADOS
+
+!recursos-guestbook.png!
+
+h2. PANTALLAZO 2: ACCESO DESDE EL NAVEGADOR
+
+!web-guestbook.png!
+
+h1. TAREA 6.1
+
+h2. PANTALLAZO 1: ACCEDER DESDE UN NAVEGADOR (TIENE QUE APARECER UN MENSAJE DE ERROR)
+
+!guestbook-errordb.png!
+
+h2. PANTALLAZO 2: NAVEGADOR WEB DESDE IP NODO MASTER Y PUERTO SERVICE
+
+!guestbook-Service.png!
+
+h2. PANTALLAZO 3: NAVEGADOR WEB USANDO NOMBRE CONFIGURADO EN INGRESS
+
+!guestbook-ingress.png!
+
+h1. TAREA 7.1
+
+h2. PANTALLAZO 1: RECURSO CONFIGMAP
+
+Primero he creado el recurso por defecto llamado *mariadb* 
+
+!mariadb-cm-default.png!
+
+y luego he metido las variables de entorno en el *mariadb.yaml*
+
+!mariadb-cm-fichero.png!
+
+h2. PANTALLAZO 2: MODIFICACION DEL FICHERO FRONTEND-DEPLOYMENT.YAML
+
+!temperaturas-frontend.png!
+
+h2. PANTALLAZO 3: MODIFICACION DEL FICHERO BACKEND-SRV.YAML
+
+!temperaturas-backend-srv.png!
+
+h2. PANTALLAZO 4: APLICACION FUNCIONANDO
+
+!web-funcionando.png!
+
+h1. TAREA 8.1
+
+h2. PANTALLAZO 1: DEFINICION RECURSO PersistentVolumenClaim
+
+!volumen-persistente.png!
+
+h2. PANTALLAZO 2: RECURSOS PV Y PVC
+
+!recursos-pvc-pv.png!
+
+h2. PANTALLAZO 3: YAML DESPLIEGUE
+
+!despliegue.png!
+
+h2. PANTALLAZO 4: INFO.PHP
+
+!web-info.png!
+
+h2. PANTALLAZO 5: ELIMINAR Y VOLVER A CREAR EL DESPLIEGUE SIRVIENDO FICHERO INFO.PHP
+
+!web-info2.png!
+
+h1. TAREA 8.2
+
+h2. PANTALLAZO 1: DEFINICION RECURSO PersistenVolumeClaim
+
+!pvc-redis.png!
+
+h2. PANTALLAZO 2: RECURSOS PV Y PVC
+
+!pv-pvc.png!
+
+h2. PANTALLAZO 3: FICHERO MODIFICADO DESPLIEGUE REDIS
+
+!redis-deployment.png!
+
+h2. PANTALLAZO 4: ACCESO APLICACION CON MENSAJES ESCRITOS
+
+!mensajes-guestbook.png!
+
+h2. PANTALLAZO 5: ELIMINAR Y VOLVER A CREAR EL DESPLIGUE REDIS Y SEGUIR VIENDO MENSAJES
+
+!redeployment.png!
+
+!mensajes-guestbook2.png!
+
+h1. TAREA 10.1 
+
+h2. PANTALLAZO 1: BUSQUEDA DE CHART CON EL COMANDO HELM
+
+!repo-wordpress.png!
+
+h2. PANTALLAZO 2: DESPLIEGUE DEL CHART
+
+!despliegue-chart.png!
+
+h2. PANTALLAZO 3: VER PODS,REPLICASETS,DEPLOYMENTS Y SERVICES CREADOS
+
+!recursos.png!
+
+h2. PANTALLAZO 4: ACCESO AL BLOG Y MI NOMBRE DE TITULO
+
+!nombre-blog.png!
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,9 @@
+h1. DOCUMENTACION CLUSTER HA
+
+h2. TAREA 1
+
+He hecho *pcs status* en el *nodo1*
+
+!pcs-status-nodo1.png!
+
+h2. TAREA 2

@@ -1,0 +1,41 @@
+h1. DRBD
+
+h2. RECURSO wwwdata
+
+Para crear el recurso me he dirigido al directorio */etc/drbd.d* y creamos un *fichero.res*, en mi caso *wwwdata.res*.
+
+!wwwdata.png!
+
+NOTA: PONER LOS NOMBRES DE LAS MAQUINAS IMPLICADAS EN EL RECURSO
+
+Luego he creado el recurso con el comando <pre> drbdadm create-md wwwdata </pre> y hemos levantado el recurso <pre> drbdadm up wwwdata </pre>.
+
+!arrancar-wwwdata.png!
+
+NOTA: ESTA CONFIGURACIÓN HAY QUE HACERLA EN LOS DOS NODOS
+
+El siguiente paso ha sido asignar *DRBD1* como nodo primario y *DRBD2* como secundario.
+<pre>drbdadm primary --force wwwdata </pre>.
+
+Hacemos <pre> drbdadm -- connect all </pre> en los dos nodos, esperamos pocos minutos y con un <pre>drbdadm status wwwdata</pre> vemos que están conectados los dos discos.
+
+!estado-drbd1.png!
+
+Luego lo formateamos con *XFS* de la siguiente manera <pre>mkfs.xfs /dev/drbd1 </pre>
+
+!xfs-drbd.png!
+
+En el nodo primario *DRBD1* hemos montado el recurso sin problemas, mientras que en el nodo secundario *DRBD2* no nos ha dejado montarlo.
+
+!drbd-montado-drbd1.png!
+
+Dentro del punto de montaje /mnt/drbd1 he creado un fichero llamado *fichero.txt*.
+
+Luego al cambiar los roles he montado el dispositivo */dev/drbd1* en  */mnt* y accediendo al punto de montaje vemos que hay un *fichero.txt* en su interior.
+
+!cambiar-roles.png!
+
+
+
+
+

@@ -1,0 +1,121 @@
+h1. TRABAJAR CON ISCSI
+
+h2. ESCENARIO
+
+He creado una red local en el que he conectado un *Servidor_ISCSI* y *Cliente_ISCSI*. Al *Servidor_ISCSI* lo he provisionado con dos volúmenes lógicos los cuales utilizaré para provisionar al *Cliente_ISCSI* de la manera que mostraré a continuación.
+
+h2. TAREA 1
+
+h3. CREAR UN TARGET
+
+Para crear un target he utilizado el comando <pre>tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.2021-12.org.miguel:target1</pre>, el siguiente paso ha sido asignar el volumen al *target* creado, lo he hecho de la siguiente manera:
+<pre>tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 -b /dev/vdb</pre>
+
+Una vez que ya le hemos asignado un volumen al target comprobamos los target definidos <pre>tgtadm --lld iscsi --op show --mode target</pre>.
+
+!mostrar-target.png!
+
+Llegados a este punto le asignaremos una tarjeta o todas las tarjetas de red por las que queramos servir nuestro *target* y lo configuraremos de la siguiente manera <pre>tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL</pre>.
+
+!interfaces.png!
+
+Para hacer *permanente la configuración del *Servidor_ISCSI* necesitamos ejecutar el siguiente comando<pre>tgt-admin --dump > /etc/tgt/conf.d/miguel.org.conf</pre>
+
+h3. BUSCAR TARGET Y ASOCIAR A LA MAQUINA CLIENTE
+
+Para escanear los target en la red he utilizado el comando <pre>iscsiadm --mode discovery --type sendtargets --portal 192.168.1.1</pre>, indicando en la opcion *portal* la ip del Servidor_ISCSI por donde está sirviendo los dispositivos de bloques.
+El siguiente paso es establecer la conexión para que podamos hacer uso del *target* creado.<pre>iscsiadm --mode node -T iqn.2021-12.org.miguel:target1 --portal 192.168.1.1 --login</pre>
+
+!volumenes-cliente.png!
+
+Una vez establecida la conexion realizaremos un <pre>lsblk -f</pre> y veremos que nos ha aparecido un nuevo dispositivo */dev/sda* con el que dadole formato y montandolo podemos usarlo como si ese dispositivo de bloques estuviera en nuestra máquina cliente.
+Para darle formato he usado <pre>fdisk /dev/sda </pre> y he creado una *partición* que ocupe todo el dispositivo, después he usado <pre>mkfs.ext4 /dev/sda1</pre> para *formatearla* y <pre>mount /dev/sda1 /mnt</pre> para *montarla*.
+
+!volumenes-clientes2.png! 
+
+h2. TAREA 2
+
+Para hacer *permanente* la conexión al *Servidor_ISCSI* ha de ejecutarse el comando <pre> iscsiadm --mode node -T iqn.2021-12.org.miguel:target1 -p 192.168.1.1 -o update -n node.startup -v automatic </pre>
+
+Para hacer que se monte automáticamente he tenido que crear un punto de montaje y un *daemon*. Cabe destacar que el nombre de nuestro daemon se llamará *iscsi.mount* debe tener el mismo nombre que nuestro punto de montaje*(/iscsi)*.
+
+!daemon.png!
+
+Y por último comprobamos que depués del reinicio ha efectuado la conexión y el montaje con éxito con <pre>lsblk -f</pre>
+
+!resultado.png!
+
+h2. TAREA 3
+
+
+He creado un nuevo *target* para esta tarea <pre>tgtadm --lld iscsi --op new --mode target --tid 2 -T iqn.2021-12.org.miguel:target2</pre> y luego le he asignado los dos volumenes que tenía libres <pre>tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 -b /dev/vdc</pre> y <pre>tgtadm --lld iscsi --op new --mode logicalunit --tid 1 --lun 1 -b /dev/vdd</pre>
+
+Le he asignado el *target* nuevo a todas las interfaces de red <pre>tgtadm --lld iscsi --op bind --mode target --tid 2 -I ALL</pre>
+
+El siguiente paso ha sido conectar la MV Windows a nuestra red local, configurar la interfaz de red y descargar *Iniciador-ISCSI*.
+
+Una vez ejectutado *Iniciador-ISCSI* 
+!Iniciado-ISCSI.png!
+
+En el apartado *Destino* ponemos la dirección ip de nuestro servidor *ISCSI* y realizaremos una *Conexión Rápida*, mostrandonos en el cuadro inferior los diferentes *target* asignados a esa *IP*. Seleccionamos el *target* al que queremos conectarnos y listo.
+
+En la pestaña *Detección* aparecen los portales destinos indicando la ip por el que sea ha conectado.
+
+!Portales-Destinos-win.png!
+
+Por último accederemos al *Administrador de Discos* y nos saldrá un cuadro de diálogo en el que nos dará la opción de tratar los nuevos discos como particiones *GPT* o *MBR* y por último tendremos las dos nuevas unidades virtuales a nuestra disposición en el cliente Windows para su posterior manipulación como si de una unidad física se tratara.
+
+!admin-discos-windowss.png!
+!discos-win-formateados.png!
+!discos-win-detectados.png!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

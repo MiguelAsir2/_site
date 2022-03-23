@@ -1,0 +1,38 @@
+h1. CLUSTER DE HA ACTIVO/PASIVO
+
+h2. TAREA 1
+
+Una vez ejecutado el Vagrantfile y pasado la receta de Ansible he ejecutado el comando <pre>ps status</pre> dentro del *nodo1* para ver el estado del cluster.
+
+!pcs-status-nodo1.png!
+
+h2. TAREA2
+
+Ahora he accedido al navegador con la url www.example.com/index.php y nos muestra en el apartado *System* que ha accedido al nodo1.
+
+!indexphp-nodo1.png!
+
+Luego he apagado el nodo1 con el comando <pre>vagrant halt nodo1</pre>, he accedido al navegador web y he comprobado que ha accedido al nodo2.
+
+!indexphp-nodo2.png!
+
+h2. TAREA 3
+
+Para realizar este ejercicio he accedido a *Mariadb* y he realizado la siguiente consulta <pre>show status like 'wspre_cluster_size';</pre>
+
+!galera-2nodos.png!
+
+h2. TAREA 4
+
+Primero he creado una tarea llamada *Cluster HA* y luego he capturado pantalla
+
+!post-wordpress.png!
+
+h1. CLUSTER DE HA ACTIVO/ACTIVO
+
+h2. TAREA 1
+
+h2. TAREA 2 
+
+h2. TAREA 3
+
